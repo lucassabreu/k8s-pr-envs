@@ -1,0 +1,21 @@
+{
+  "name": "k8s-pr-envs",
+  "version": "1.0.0",
+  "description": "A simple k8s deploy sample",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com:lucassabreu/k8s-pr-envs.git"
+  },
+  "author": "Lucas dos Santos Abreu <lucas.s.abreu@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.2"
+  },
+  "devDependencies": {
+    "supervisor": "^0.12.0"
+  }
+}
