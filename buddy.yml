@@ -1,0 +1,12 @@
+- pipeline: "Build"
+  trigger_mode: "ON_EVERY_PUSH"
+  ref_name: "master"
+  actions:
+  - action: "Build Docker image"
+    type: "DOCKERFILE"
+    login: "${DOCKER_HUB_USER}"
+    password: "${DOCKER_HUB_PASSWORD}"
+    docker_image_tag: "${execution.to_revision.revision}"
+    dockerfile_path: "Dockerfile"
+    repository: "lucassabreu/k8s-pr-envs"
+
