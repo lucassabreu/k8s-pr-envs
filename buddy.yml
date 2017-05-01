@@ -9,4 +9,36 @@
     docker_image_tag: "${execution.to_revision.revision}"
     dockerfile_path: "Dockerfile"
     repository: "lucassabreu/k8s-pr-envs"
+- pipeline: "Deploy Staging"
+  trigger_mode: "ON_EVERY_PUSH"
+  ref_name: "master"
+  actions:
+  - action: "Deploy Master to Staging"
+    type: "BUILD"
+    docker_image_name: "lucassabreu/openshift-k8s-cli"
+    docker_image_tag: "latest"
+    execute_commands:
+    - TAG="${execution.to_revision.revision}"
+      ENV=staging
+      OPENSHIFT_NAMESPACE="${OPENSHIFT_NAMESPACE}"
+      OPENSHIFT_API_URL="${OPENSHIFT_API_URL}"
+      OPENSHIFT_TOKEN="${OPENSHIFT_TOKEN}"
+      OPENSHIFT_DOMAIN="${OPENSHIFT_DOMAIN}"
+      ./k8s/deploy
+- pipeline: "Deploy Production"
+  trigger_mode: "MANUAL"
+  ref_name: "master"
+  actions:
+  - action: "Deploy Master to Production"
+    type: "BUILD"
+    docker_image_name: "lucassabreu/openshift-k8s-cli"
+    docker_image_tag: "latest"
+    execute_commands:
+    - TAG="${execution.to_revision.revision}"
+      ENV=production
+      OPENSHIFT_NAMESPACE="${OPENSHIFT_NAMESPACE}"
+      OPENSHIFT_API_URL="${OPENSHIFT_API_URL}"
+      OPENSHIFT_TOKEN="${OPENSHIFT_TOKEN}"
+      OPENSHIFT_DOMAIN="${OPENSHIFT_DOMAIN}"
+      ./k8s/deploy
 

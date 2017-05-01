@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hw-dpl-__ENV__
+  labels:
+    app: __ENV__
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: __ENV__
+        name: hw-pod
+    spec:
+      containers:
+      - name: hw-container
+        image: __IMAGE_TAG__
+        imagePullPolicy: Always
+        ports:
+        - name: web-port
+          containerPort: 8080
+---
+apiVersion: "v1"
+kind: Service
+metadata:
+  name: hw-src-__ENV__
+  labels:
+    app: __ENV__
+spec:
+  ports:
+    - port: 80
+      targetPort: "web-port"
+      protocol: TCP
+  selector:
+    name: hw-pod
+    app: __ENV__
+---
+apiVersion: v1
+kind: Route
+metadata:
+  name: __ENV__
+  labels:
+    app: __ENV__
+spec:
+  host: __HOSTNAME__
+  to:
+    kind: Service
+    name: hw-src-__ENV__
+
