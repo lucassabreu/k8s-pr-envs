@@ -1,0 +1,25 @@
+#!/bin/bash
+
+echo ">> Connecting to OpenShift..."
+oc login "$OPENSHIFT_API_URL" --token "$OPENSHIFT_TOKEN"
+oc project "$OPENSHIFT_NAMESPACE"
+
+echo ">> Removing old application..."
+oc delete all -l "app=$ENV"
+
+IMAGE_TAG="lucassabreu/k8s-pr-envs:$TAG"
+HOSTNAME="$OPENSHIFT_NAMESPACE-$ENV.$OPENSHIFT_DOMAIN"
+
+if [ "$ENV" = "production" ]; then
+    HOSTNAME=$OPENSHIFT_NAMESPACE.$OPENSHIFT_DOMAIN
+fi
+
+echo ">> Deploying application..."
+sed "
+    s|__ENV__|$ENV|;
+    s|__IMAGE_TAG__|$IMAGE_TAG|;
+    s|__HOSTNAME__|$HOSTNAME|;
+    " k8s/full.yml | oc apply -f -
+
+echo "Enviroment $ENV deployed to: http://$HOSTNAME/"
+
