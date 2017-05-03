@@ -27,6 +27,8 @@
     execute_commands:
     - TAG="${execution.branch.name}"
       ENV="${execution.branch.name}"
+      GITHUB_TOKEN="${GITHUB_TOKEN}"
+      LOG_URL="${execution.html_url}"
       OPENSHIFT_NAMESPACE="${OPENSHIFT_NAMESPACE}"
       OPENSHIFT_API_URL="${OPENSHIFT_API_URL}"
       OPENSHIFT_TOKEN="${OPENSHIFT_TOKEN}"

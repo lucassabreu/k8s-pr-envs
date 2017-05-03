@@ -21,5 +21,19 @@ sed "
     s|__HOSTNAME__|$HOSTNAME|;
     " k8s/full.yml | oc apply -f -
 
+if [ ! -z $GITHUB_TOKEN ] && [ "$ENV" != "production" ] && [ "$ENV" != "staging" ]; then
+    echo ">> Registering $ENV deployment..."
+
+    ID_DEPLOYMENT=$(k8s/github-deployment "lucassabreu/k8s-pr-envs" "$GITHUB_TOKEN" search "ref=$ENV" | jq ". | last | .id")
+    if [ "$ID_DEPLOYMENT" == "null" ]; then
+        ID_DEPLOYMENT=$(k8s/github-deployment "lucassabreu/k8s-pr-envs" "$GITHUB_TOKEN" create "$ENV" "$ENV" true | jq ".id")
+    fi
+    RETURN=$(k8s/github-deployment "lucassabreu/k8s-pr-envs" "$GITHUB_TOKEN" status set "$ID_DEPLOYMENT" success "http://$HOSTNAME/" "$LOG_URL")
+    if [ "$(echo $RETURN | jq ".message")" != "null" ]; then
+        echo $RETURN
+        exit 1
+    fi
+fi
+
 echo "Enviroment $ENV deployed to: http://$HOSTNAME/"
 
