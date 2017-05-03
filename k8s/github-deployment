@@ -1,0 +1,112 @@
+#!/bin/bash
+
+function get {
+    ID=$1
+    URL="https://api.github.com/repos/$REPO/deployments"
+
+    if [ "$ID" != "" ]; then
+        URL="$URL/$ID"
+    fi
+
+    curl -sL -X GET $URL -H "Authorization: token $TOKEN"
+}
+
+function create {
+    ENV=$1
+    REF=$2
+    TRANSIENT=$3
+
+    if [ "$TRANSIENT" = "" ]; then
+        TRANSIENT=true
+    fi
+
+    curl -sL -X POST "https://api.github.com/repos/$REPO/deployments" \
+        -H "Authorization: token $TOKEN" \
+        -d "{\
+            \"ref\":\"$REF\",\
+            \"environment\":\"$ENV\",\
+            \"transient_environment\": $TRANSIENT, \
+            \"required_contexts\":[], \
+            \"auto_merge\": false
+        }"
+}
+
+function search {
+    FILTER=$1
+
+    curl -sL -X GET "https://api.github.com/repos/$REPO/deployments?$FILTER" \
+        -H "Authorization: token $TOKEN"
+}
+
+function get_status {
+    ID=$1
+
+    curl -sL -X GET "https://api.github.com/repos/$REPO/deployments/$ID/statuses" \
+        -H "Authorization: token $TOKEN"
+
+}
+
+function set_status {
+    ID=$1
+    STATUS=$2
+    ENV_URL=$3
+    TARGET_URL=$4
+
+    curl -sL -X POST "https://api.github.com/repos/$REPO/deployments/$ID/statuses" \
+        -H "Authorization: token $TOKEN" \
+        -H "Accept: application/vnd.github.ant-man-preview+json" \
+        -d "{\
+            \"state\":\"$STATUS\", \
+            \"environment_url\":\"$ENV_URL\",\
+            \"target_url\": \"$TARGET_URL\",
+            \"description\": \"$ENV deployed\"\
+        }"
+}
+
+function inactive {
+    ENV=$1
+    LOG_URL=$2
+
+    search "environment=$ENV" | jq ".[].id" | sed "s|\(.*\)|$0 '$REPO' '$TOKEN' status set \1 inactive '' '$LOG_URL'|" | sh
+}
+
+if [ "$1" = "" ]; then
+    echo "You must inform a action to perform !"
+    exit 1
+fi
+
+TOKEN=$2
+REPO=$1
+
+if [ "$3" = "create" ]; then
+    create ${@:4}
+    exit
+fi
+
+if [ "$3" = "get" ]; then
+    get ${@:4}
+    exit
+fi
+
+if [ "$3" = "search" ]; then
+    search ${@:4}
+    exit
+fi
+
+if [ "$3" = "status" ]; then
+    if [ "$4" = "set" ]; then
+        set_status ${@:5}
+        exit
+    fi
+
+    get_status ${@:4}
+    exit
+fi
+
+if [ "$3" = "inactive" ]; then
+    inactive ${@:4}
+    exit
+fi
+
+echo "Unknown action !"
+exit 1
