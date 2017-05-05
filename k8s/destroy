@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo ">> Connecting to OpenShift..."
+oc login "$OPENSHIFT_API_URL" --token "$OPENSHIFT_TOKEN"
+oc project "$OPENSHIFT_NAMESPACE"
+
+echo ">> Removing old application..."
+oc delete all -l "app=$ENV"
+
+k8s/github-deployment "lucassabreu/k8s-pr-envs" "$GITHUB_TOKEN" inactive "$ENV" >> /dev/null
+

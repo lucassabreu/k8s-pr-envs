@@ -34,6 +34,21 @@
       OPENSHIFT_TOKEN="${OPENSHIFT_TOKEN}"
       OPENSHIFT_DOMAIN="${OPENSHIFT_DOMAIN}"
       ./k8s/deploy
+- pipeline: "Close Review"
+  trigger_mode: "MANUAL"
+  ref_name: "((?!master).*)"
+  actions:
+  - action: "Destroy Branch Environment"
+    type: "BUILD"
+    docker_image_name: "lucassabreu/openshift-k8s-cli"
+    docker_image_tag: "latest"
+    execute_commands:
+    - ENV="${execution.branch.name}"
+      GITHUB_TOKEN="${GITHUB_TOKEN}"
+      OPENSHIFT_NAMESPACE="${OPENSHIFT_NAMESPACE}"
+      OPENSHIFT_API_URL="${OPENSHIFT_API_URL}"
+      OPENSHIFT_TOKEN="${OPENSHIFT_TOKEN}"
+      ./k8s/destroy
 - pipeline: "Deploy Staging"
   trigger_mode: "ON_EVERY_PUSH"
   ref_name: "master"
