@@ -6,5 +6,5 @@ Is a simple example of how to implement a process of deploy by branch to a Opens
 Using [Buddy](https://buddy.works/) as CI and [Getup Cloud](https://getupcloud.com/) OpenShift Cluster to deploy. I do resgister the deployments into GitHub using the [Deployment API](https://developer.github.com/v3/repos/deployments/) they provide.
 
 You can see my post about this in here:
-[Ambientes por Branch com OpenShift Next Gen usando GitHub](http://blog.coderockr.com/estou-trabalhando-nisso-ainda)
+[Ambientes por Branch com OpenShift Next Gen usando GitHub](https://blog.coderockr.com/ambientes-por-branch-com-openshift-next-gen-usando-github-80f46091340b)
 
